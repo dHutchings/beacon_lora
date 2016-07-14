@@ -27,6 +27,13 @@ def send_AT_command(serial,command,delay=0):
 	#if the last element is not 'OK', or if one of the elements is 'ERROR', there was an error.
 	#at which point we return -1
 
+def get_time(serial):
+	#gets the time string over the radio from the Multitech, using the control sequence +++
+	answer = send_AT_command(ser,"AT+send=+++",delay=3)
+	#reply is always the second line sent back... since first is the command itself.
+	return answer[1]
+
+
 ser = serial.Serial('/dev/ttyACM1',115200,timeout=1)
 
 #first set of commands come direct from docu sheet given by Christine
@@ -42,6 +49,10 @@ send_AT_command(ser,"AT+RXO=1")
 #now, join the network (with a long delay since it takes a while)
 send_AT_command(ser,"AT+join",delay=10)
 
+
+print(get_time(ser))
+
 #I close the port here so a minicom can come through and get into it.  It will be correctly configured to immediately send using the 
 #AT_send= command.
 ser.close()
+
