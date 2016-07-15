@@ -71,6 +71,8 @@ if __name__ == "__main__":
     
     print(args)
 
+    start_time = time.time()
+
     if args.port is None:
         raise UserWarning("Must have a com port...")
     if (args.manual is False) and (args.filename is None):
@@ -81,6 +83,11 @@ if __name__ == "__main__":
 
     time.sleep(1)
 
+    radio_setup = (time.time() - start_time)
+    print("Time to setup radio was " + str(radio_setup) + " sec")
+
+    start_time = time.time()
+    old_time = time.time()
     if not args.manual:
         #http://www.pythonforbeginners.com/csv/using-the-csv-module-in-python
         f = open(args.filename, 'r')
@@ -88,16 +95,21 @@ if __name__ == "__main__":
         for row in reader:
             #each row is a list of values.  Have to glue them back together into a single string.
             data = ','.join(row)
-            print(len(data))
-            send_AT_command(ser,"AT+send="+str(data),delay=3)
+            send_AT_command(ser,"AT+send="+str(data),delay=2)
+            print(time.time() - old_time)
+            old_time = time.time()
 
-            print(str(data))
         #transmit data here... or something.
         pass
+
+    data_transmit = (time.time() - start_time())/60.0
+    print("Time to setup radio was " + str(radio_setup) + " sec")
+    print("Time to transmit was " + str(data_transmit) + " min")
 
     #I close the port here so a minicom can come through and get into it.  It will be correctly configured to immediately send using the 
     #AT_send= command.
     ser.close()
+
 
 
 #print(get_time(ser))
