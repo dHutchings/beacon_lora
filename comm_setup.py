@@ -41,9 +41,11 @@ def setup_radio(serial):
     #first set of commands come direct from docu sheet given by Christine
     #get attention of the router
     send_AT_command(ser,"AT")
+
     #setup my networking info, so I can join the network
     send_AT_command(ser,"AT+ni=1,bconduit")
     send_AT_command(ser,"AT+nk=1,CO2Network2012")
+    send_AT_command(ser,"AT+FSB=7")
 
     #this one I found.  Replies are put in ASCII, not hex.
     send_AT_command(ser,"AT+RXO=1")
