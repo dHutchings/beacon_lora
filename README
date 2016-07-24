@@ -1,1 +1,5 @@
 copy the rules files into /etc/udev/rules.d
+
+Using "sudo visudo", add the following line to the bottom of the file:
+ALL ALL=(ALL) NOPASSWD: /bin/date
+

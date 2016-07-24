@@ -3,6 +3,7 @@ import time
 import sys
 import serial
 import csv
+import os
 global ser
 
 def printv(string,verbose,alt_print=None):
@@ -57,6 +58,25 @@ def setup_mdots(port,attempts,verbose = True):
         return 0
 
     return 1
+
+
+def set_time(attempts=999,verbose= True):
+    #function that sets the system time to whatever the multitech router thinks it is.
+    global ser
+    done = False
+    setup_attempts = attempts
+
+    while (not done) and (setup_attempts > 0):
+        setup_attempts = setup_attempts - 1
+        try:
+            date_str = comm_handler.get_time()
+            date_str = date_str[:-15] #trim off the  GMT+0000 (UTC)
+            date_str = "'" + date_str + " UTC'" #and format it the way linux likes it.
+            os.system("sudo date -s %s" % date_str) #and run the command with sudo.  As long as visudo has been done, this should run without error
+            done = True
+        except e:
+            printv(e,verbose)
+
 
 def transmit_file(file_name,attempts=999,verbose= True):
     global ser
@@ -130,4 +150,5 @@ if __name__ == "__main__":
     result = setup_mdots(args.port,args.attempts,verbose=args.no_prints)
 
     if (not args.manual) and (result is 1):
-        transmit_file(args.filename,args.attempts)
+        set_time(args.attempts,verbose=args.no_prints)
+        transmit_file(args.filename,attempts=args.attempts,verbose=args.no_prints)
