@@ -23,7 +23,6 @@ def send_AT_command(command,delay=0):
     if not(len(answer) > 0):
         raise IOError("no answer")
     elif "ERROR" in answer:
-        print("AT Command Error")
         raise(IOError("AT command error " + str(answer)))
     elif not(answer[-1] == "OK"):
         raise(IOError("Did not terminate with OK " + str(answer)))
@@ -60,8 +59,6 @@ def setup_radio(ser):
 
     #now, join the network (with a long delay since it takes a while)
     send_AT_command("AT+join",delay=10)
-
-    print("Radio Setup sucessful")
 
 def send_data(data,delay=0):
     send_AT_command("AT+send="+str(data),delay=2)

@@ -5,7 +5,17 @@ import serial
 
 global ser
 
-def setup_mdots(port,attempts):
+def printv(string,verbose,alt_print=None):
+    #If I am verbose, print the string.
+    #Else, do nothing, unless there is an alt print (at which point, print it)
+
+    if verbose:
+        print string
+    else:
+        if alt_print is not None:
+            print alt_print
+
+def setup_mdots(port,attempts,verbose = True):
     #the bulletproofed setup of the mdots radio
     if port is None:
         raise UserWarning("Must have a com port...")
@@ -20,35 +30,33 @@ def setup_mdots(port,attempts):
             comm_handler.setup_radio(ser)
             setup = True
         except IOError,e:
-            print("transmission failed...")
-            print(e)
+            printv("Transmission Failed...",verbose)
+            printv(e,verbose)
             time.sleep(1)
         except OSError,e:
-            print("Resource unavailable?  Try again")
-            print(e)
+            printv("Resource unavailable?  Try again",verbose)
+            printv(e,verbose)
             time.sleep(1)
         except:
-            print("Other kind of error... neeed to exit")
+            printv("Other kind of error... neeed to exit",verbose)
             e = sys.exc_info()[0]
-            print(e)
+            printv(e,verbose)
             try:
                 ser.close()
             except:
                 e = sys.exc_info()[0]
-                return 0
+            printv("",verbose,alt_print=0)
             sys.exit()
 
     if(setup_counts == 0):
-        print("Attemps to setup Exhausted.  Exiting")
+        printv("Attemps to setup Exhausted.  Exiting",verbose,alt_print=0)
         try:
             ser.close()
         except:
-            print("Can't close serial port")
+            printv("Can't close serial port",verbose)
         return 0
 
-    return 1
-
-def transmit_file(file_name,attempts=999):
+def transmit_file(file_name,attempts=999,verbose= True):
     global ser
 
     if file is None:
@@ -58,12 +66,12 @@ def transmit_file(file_name,attempts=999):
     success = setup_mdots(file_name,attempts)
     if success == 0:
         #faliure
-        return 0
+        printv("",verbose,alt_print=0)
     
     time.sleep(1)
 
     radio_setup = (time.time() - start_time)
-    print("Time to setup radio was " + str(radio_setup) + " sec")
+    printv("Time to setup radio was " + str(radio_setup) + " sec",verbose)
 
 
 
@@ -84,39 +92,42 @@ def transmit_file(file_name,attempts=999):
                 #send_AT_command(ser,"AT+send="+str(data),delay=2)
                 sent = True
             except IOError,e:
-                print("transmission failed... try again")
-                print(e)
+                printv("transmission failed... try again",verbose)
+                printv(e,verbose)
                 time.sleep(1)
             except OSError,e:
-                print("Resource unavailable?  Try again")
-                print(e)
+                printv("Resource unavailable?  Try again",verbose)
+                printv(e,verbose)
                 time.sleep(1)
 
             except:
-                print("Other kind of error... neeed to exit")
-                ser.close()
-                sys.exit()
-
-            if(send_counts == 0):
-                print("Attemps to send data exhausted. Exiting")
+                printv("Other kind of error... neeed to exit",verbose,alt_print=0)
                 try:
                     ser.close()
                 except:
-                    print("Can't close serial port")
-                return 0
+                    printv("Can't close serial port",verbose)
+                sys.exit()
+
+            if(send_counts == 0):
+                printv("Attemps to send data exhausted. Exiting",verbose,alt_print=0)
+                try:
+                    ser.close()
+                except:
+                    printv("Can't close serial port",verbose)
 
 
-        print(time.time() - old_time)
-        old_time = time.time()
+        #print(time.time() - old_time)
+        #old_time = time.time()
 
     data_transmit = (time.time() - start_time)/60.0
     #print("Time to setup radio was " + str(radio_setup) + " sec")
-    print("Time to transmit was " + str(data_transmit) + " min")
+    printv("Time to transmit was " + str(data_transmit) + " min",verbose)
 
     #I close the port here so a minicom can come through and get into it.  It will be correctly configured to immediately send using the 
     #AT_send= command.
     ser.close()
-    return 1
+    
+    printv("Success!",verbose,alt_print=1)
 
 if __name__ == "__main__":
     import argparse
@@ -125,9 +136,10 @@ if __name__ == "__main__":
     parser.add_argument('--filename', default = None, help='Setup Radio, and then start transmitting data.')
     parser.add_argument('--port', type=str, help='The com port used for the mdot radio.')
     parser.add_argument('--attempts', type=int, default=999, help ="The number of times to attempt transmission before giving up.  Default is 999")
+    parser.add_argument('--no_prints', action='store_false', default = True, help='No helpful error messages.  Only prints 1 (success) or 0 (faliure)')
     args = parser.parse_args()
 
-    result = setup_mdots(args.port,args.attempts)
+    result = setup_mdots(args.port,args.attempts,verbose=args.no_prints)
 
     if (not args.manual) and (result is 1):
         transmit_file(filename,args.attempts)
