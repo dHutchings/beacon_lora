@@ -1,0 +1,7 @@
+# mdots radios, tested for MultiTech MTDOT-915
+#based on https://github.com/rogerclarkmelbourne/Arduino_STM32/blob/master/tools/linux64/49-stlinkv2-1.rules, and Ryan's help
+
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="04e2", ATTRS{idProduct}=="1410", \
+    MODE:="0666", \
+    SYMLINK+="radio"
+

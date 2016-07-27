@@ -46,8 +46,8 @@ data_directory="/home/doug/Desktop/beacon_lora/2016_06"
 #a list of all files that have been successfuly transmitted
 transmission_log="/home/doug/Desktop/beacon_lora/transmit_log.txt"
 
-#this will need to be identified somehow, currently, it's hardcoded.
-port_name="/dev/ttyACM1"
+#this port name will always be guranteed, thanks to udev rules.
+port_name="/dev/radio"
 
 if [ ! -e $transmission_log ]; then
 	#the transmission long doesn't exist... let's make one.
@@ -65,7 +65,8 @@ for file in $(find $data_directory -name "*.csv"); do
 	#if I haven't transmitted theis file yet (aka it's not in the transmission log)
 	then
 		#transmit the data... blocking untill success achieved.
-		success=$(sudo python transmit_file.py --filename "$file" --port "$port_name" --attempts 1 --no_prints)
+		#don't need sudo thanks to udev rules setting the permissions to be 0666.
+		success=$(python transmit_file.py --filename "$file" --port "$port_name" --attempts 1 --no_prints)
 		if [ $success == 1 ]; then		
 			#them add the filename to the log file.
 			echo "$file" >> "$transmission_log"
