@@ -42,6 +42,9 @@ def setup_radio(ser):
     #one argument: the serial connection
     global serial
     serial = ser
+    #first, clear the incoming traffic so there aren't any problems.
+    readlines_strip()
+
     #first set of commands come direct from docu sheet given by Christine
     #get attention of the router
     send_AT_command("AT")
