@@ -2,7 +2,7 @@ import comm_handler
 import time
 import sys
 import serial
-
+import csv
 global ser
 
 def printv(string,verbose,alt_print=None):
@@ -56,6 +56,8 @@ def setup_mdots(port,attempts,verbose = True):
             printv("Can't close serial port",verbose)
         return 0
 
+    return 1
+
 def transmit_file(file_name,attempts=999,verbose= True):
     global ser
 
@@ -63,33 +65,21 @@ def transmit_file(file_name,attempts=999,verbose= True):
         raise UserWarning("Must have a datafile to transmit") 
 
     start_time = time.time()
-    success = setup_mdots(file_name,attempts)
-    if success == 0:
-        #faliure
-        printv("",verbose,alt_print=0)
-    
-    time.sleep(1)
-
-    radio_setup = (time.time() - start_time)
-    printv("Time to setup radio was " + str(radio_setup) + " sec",verbose)
-
-
-
-    start_time = time.time()
-    old_time = time.time()
     #now, start transmitting the .csv file
     f = open(args.filename, 'r')
     reader = csv.reader(f)
+    
     for row in reader:
         #each row is a list of values.  Have to glue them back together into a single string.
         data = ','.join(row)
         
         sent = False
-        sent_counts = args.attemps
+        send_counts = attempts
 
         while (not sent) and (send_counts > 0):              
+            send_counts = send_counts -1
             try:
-                #send_AT_command(ser,"AT+send="+str(data),delay=2)
+                comm_handler.send_data(data,delay=2)
                 sent = True
             except IOError,e:
                 printv("transmission failed... try again",verbose)
@@ -116,8 +106,6 @@ def transmit_file(file_name,attempts=999,verbose= True):
                     printv("Can't close serial port",verbose)
 
 
-        #print(time.time() - old_time)
-        #old_time = time.time()
 
     data_transmit = (time.time() - start_time)/60.0
     #print("Time to setup radio was " + str(radio_setup) + " sec")
@@ -136,10 +124,10 @@ if __name__ == "__main__":
     parser.add_argument('--filename', default = None, help='Setup Radio, and then start transmitting data.')
     parser.add_argument('--port', type=str, help='The com port used for the mdot radio.')
     parser.add_argument('--attempts', type=int, default=999, help ="The number of times to attempt transmission before giving up.  Default is 999")
-    parser.add_argument('--no_prints', action='store_false', default = True, help='No helpful error messages.  Only prints 1 (success) or 0 (faliure)')
+    parser.add_argument('--no_prints', action='store_true', default = False, help='No helpful error messages.  Only prints 1 (success) or 0 (faliure)')
     args = parser.parse_args()
 
     result = setup_mdots(args.port,args.attempts,verbose=args.no_prints)
 
     if (not args.manual) and (result is 1):
-        transmit_file(filename,args.attempts)
+        transmit_file(args.filename,args.attempts)
