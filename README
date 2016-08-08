@@ -1,5 +1,17 @@
-copy the rules files into /etc/udev/rules.d
+Code to transmit data from the raspi to the multitech router for the Beacon lora Project.
 
-Using "sudo visudo", add the following line to the bottom of the file:
+To install on a RPI:
+
+1) copy this repo to the raspi.  It is preferred to get the raspi on the internet (for setup), and then run:
+git clone https://github.com/dHutchings/beacon_lora.git
+
+2) copy the rules files into /etc/udev/rules.d.  You will need sudo, so the command will look:
+sudo cp *.rules /etc/udev/rules.d
+
+3) Using "sudo visudo", add the following line to the bottom of the file:
 ALL ALL=(ALL) NOPASSWD: /bin/date
 
+4) open up transmit_data.sh, and change the absolute paths to be what you want.
+There are 4 to do: lines 7,45,47,57.
+
+5) Attach ./transmit_data.sh to a cronjob, using sudo crontab -e.  Run once an hour or day.
