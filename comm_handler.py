@@ -44,6 +44,9 @@ def setup_radio(ser):
     serial = ser
     #first, clear the incoming traffic so there aren't any problems.
     readlines_strip()
+    #and then flush the buffers for good measure.
+    ser.flushInput()
+    ser.flushOutput()
 
     #first set of commands come direct from docu sheet given by Christine
     #get attention of the router
