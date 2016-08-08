@@ -72,9 +72,12 @@ def set_time(attempts=999,verbose= True):
             date_str = comm_handler.get_time()
             date_str = date_str[:-15] #trim off the  GMT+0000 (UTC)
             date_str = "'" + date_str + " UTC'" #and format it the way linux likes it.
-            os.system("sudo date -s %s" % date_str) #and run the command with sudo.  As long as visudo has been done, this should run without error
+            printv(date_str,verbose)
+            os.system("sudo date -s %s > /dev/null" % date_str) 
+            #run the command with sudo.  As long as visudo has been done, this should run without error
+            #redorect the output of this command to /dev/null so nothing gets printed.. (note: this may hide any error messages caused by insufficient)
             done = True
-        except e:
+        except Exception,e:
             printv(e,verbose)
 
 
