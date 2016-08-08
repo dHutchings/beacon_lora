@@ -106,7 +106,7 @@ def transmit_file(file_name,attempts=999,verbose= True):
         while (not sent) and (send_counts > 0):              
             send_counts = send_counts -1
             try:
-                comm_handler.send_data(data,delay=2)
+                comm_handler.send_data(data,delay=1)
                 sent = True
             except IOError,e:
                 printv("transmission failed... try again",verbose)

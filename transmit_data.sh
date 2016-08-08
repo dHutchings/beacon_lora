@@ -72,7 +72,7 @@ for file in $(find $data_directory -name "*.csv"); do
 		then
 			#transmit the data... blocking untill success achieved.
 			#don't need sudo thanks to udev rules setting the permissions to be 0666.
-			success=$(python transmit_file.py --filename "$file" --port "$port_name" --attempts 2)
+			success=$(python /home/doug/Desktop/beacon_lora/transmit_file.py --filename "$file" --port "$port_name" --attempts 2)
 			if [ $success == 1 ]; then		
 				#them add the filename to the log file.
 				echo "$file" >> "$transmission_log"
