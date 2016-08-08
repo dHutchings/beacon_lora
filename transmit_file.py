@@ -49,7 +49,7 @@ def setup_mdots(port,attempts,verbose = True):
             printv("",verbose,alt_print=0)
             sys.exit()
 
-    if(setup_counts == 0):
+    if(setup_counts == 0) and (not setup):
         printv("Attemps to setup Exhausted.  Exiting",verbose,alt_print=0)
         try:
             ser.close()
@@ -118,12 +118,13 @@ def transmit_file(file_name,attempts=999,verbose= True):
                     printv("Can't close serial port",verbose)
                 sys.exit()
 
-            if(send_counts == 0):
+            if (send_counts == 0) and (not sent):
                 printv("Attemps to send data exhausted. Exiting",verbose,alt_print=0)
                 try:
                     ser.close()
                 except:
                     printv("Can't close serial port",verbose)
+                sys.exit()
 
 
 
