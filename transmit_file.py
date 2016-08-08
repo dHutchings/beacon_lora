@@ -4,6 +4,8 @@ import sys
 import serial
 import csv
 import os
+
+
 global ser
 
 def printv(string,verbose,alt_print=None):
@@ -20,6 +22,8 @@ def setup_mdots(port,attempts,verbose = True):
     #the bulletproofed setup of the mdots radio
     if port is None:
         raise UserWarning("Must have a com port...")
+
+    global ser #ensure that the com port that will be opened up is global.
 
     setup= False
     setup_counts = attempts
