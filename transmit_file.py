@@ -148,11 +148,13 @@ if __name__ == "__main__":
     parser.add_argument('--filename', default = None, help='Setup Radio, and then start transmitting data.')
     parser.add_argument('--port', type=str, help='The com port used for the mdot radio.')
     parser.add_argument('--attempts', type=int, default=999, help ="The number of times to attempt transmission before giving up.  Default is 999")
-    parser.add_argument('--no_prints', action='store_true', default = False, help='No helpful error messages.  Only prints 1 (success) or 0 (faliure)')
+    parser.add_argument('--prints', action='store_true', default = False, help='Turn on helpful error messages.  Otherwise, only prints 1 (success) or 0 (faliure)')
     args = parser.parse_args()
 
-    result = setup_mdots(args.port,args.attempts,verbose=args.no_prints)
+    result = setup_mdots(args.port,args.attempts,verbose=args.prints)
 
     if (not args.manual) and (result is 1):
-        set_time(args.attempts,verbose=args.no_prints)
-        transmit_file(args.filename,attempts=args.attempts,verbose=args.no_prints)
+        set_time(args.attempts,verbose=args.prints)
+        transmit_file(args.filename,attempts=args.attempts,verbose=args.prints)
+    elif (result is 0):
+        printv("Failed to setup",args.prints,alt_print=0)
