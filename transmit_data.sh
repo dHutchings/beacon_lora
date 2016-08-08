@@ -64,12 +64,20 @@ for file in $(find $data_directory -name "*.csv"); do
 	if ! grep -Fxq "$transmission_log" "$file";
 	#if I haven't transmitted theis file yet (aka it's not in the transmission log)
 	then
-		#transmit the data... blocking untill success achieved.
-		#don't need sudo thanks to udev rules setting the permissions to be 0666.
-		success=$(python transmit_file.py --filename "$file" --port "$port_name" --attempts 1 --no_prints)
-		if [ $success == 1 ]; then		
-			#them add the filename to the log file.
-			echo "$file" >> "$transmission_log"
+		#ok, i haven't transmitted it yet... 
+		#but I can't transmit files that are still under construction.
+		#each complete file is 719, 720, or 721 lines if it's complete.
+		length=$(wc -l $file | cut -f1 -d" ") #length of the file, in lines.  Use the cut command to remove the unneeded text	
+		if [ $length -ge 719 ]; 
+		then
+			#transmit the data... blocking untill success achieved.
+			#don't need sudo thanks to udev rules setting the permissions to be 0666.
+			success=$(python transmit_file.py --filename "$file" --port "$port_name" --attempts 1 --no_prints)
+			echo $success
+			if [ $success == 1 ]; then		
+				#them add the filename to the log file.
+				echo "$file" >> "$transmission_log"
+			fi
 		fi
 	fi
 done
